@@ -45,6 +45,7 @@ public class EventoController {
         try {
             return ResponseEntity.ok(eventoService.getAllEventos());
         } catch (Exception e) {
+        	e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
         }

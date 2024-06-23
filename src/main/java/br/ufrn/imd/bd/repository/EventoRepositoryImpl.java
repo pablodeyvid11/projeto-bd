@@ -124,10 +124,8 @@ public class EventoRepositoryImpl implements EventosRepository {
 		evento.setTitle(rs.getString("titulo"));
 		evento.setIngressoPrice(rs.getBigDecimal("preco_ingresso").doubleValue());
 		evento.setDescription(rs.getString("descricao"));
-		evento.setStartDateTime(
-				rs.getDate("data_horario_inicio").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-		evento.setEndDateTime(
-				rs.getDate("data_horario_fim").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+		evento.setStartDateTime(rs.getTimestamp("data_horario_inicio").toLocalDateTime());
+	    evento.setEndDateTime(rs.getTimestamp("data_horario_fim").toLocalDateTime());
 		evento.setQtyIngressos(rs.getInt("qtd_ingressos"));
 		return evento;
 	}

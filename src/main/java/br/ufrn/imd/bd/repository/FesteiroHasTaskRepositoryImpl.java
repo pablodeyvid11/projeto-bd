@@ -64,4 +64,50 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 		}
 		return false;
 	}
+
+	@Override
+	public void update(FesteiroHasTask festeiroHasTask) {
+		String sql = String.format(
+				"UPDATE %s SET pontos_ganhos = ?, is_validado = ? WHERE TASK_id = ? AND FESTEIRO_id = ?",
+				getTableName());
+
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setDouble(1, festeiroHasTask.getPointsWin());
+			ps.setBoolean(2, festeiroHasTask.getIsValidated());
+			ps.setLong(3, festeiroHasTask.getTaskId());
+			ps.setLong(4, festeiroHasTask.getFesteiroId());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public FesteiroHasTask findByTaskIdAndFesteiroId(Long taskId, Long festeiroId) {
+		String sql = String.format("SELECT * FROM %s WHERE TASK_id = ? AND FESTEIRO_id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, taskId);
+			ps.setLong(2, festeiroId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapRowToFesteiroHasTask(rs);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private FesteiroHasTask mapRowToFesteiroHasTask(ResultSet rs) throws SQLException {
+		FesteiroHasTask festeiroHasTask = new FesteiroHasTask();
+		festeiroHasTask.setTaskId(rs.getLong("TASK_id"));
+		festeiroHasTask.setFesteiroId(rs.getLong("FESTEIRO_id"));
+		festeiroHasTask.setPointsWin(rs.getDouble("pontos_ganhos"));
+		festeiroHasTask.setIsValidated(rs.getBoolean("is_validado"));
+		return festeiroHasTask;
+	}
 }

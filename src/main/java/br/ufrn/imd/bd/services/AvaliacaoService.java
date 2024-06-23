@@ -47,11 +47,6 @@ public class AvaliacaoService {
 			throw new IllegalStateException("Evento não encontrado.");
 		}
 
-		LocalDateTime now = LocalDateTime.now();
-		if (now.isBefore(evento.getEndDateTime())) {
-			throw new IllegalStateException("O evento ainda não terminou.");
-		}
-
 		Ingresso ingresso = ingressoRepository.findByEventoIdAndFesteiroId(avaliacao.getEventoId(), festeiroId);
 		if (ingresso == null) {
 			throw new IllegalStateException("Festeiro não possui ingresso para este evento.");

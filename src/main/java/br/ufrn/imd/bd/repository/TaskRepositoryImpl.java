@@ -139,9 +139,8 @@ public class TaskRepositoryImpl implements TaskRepository {
 		task.setId(rs.getLong("id"));
 		task.setName(rs.getString("nome"));
 		task.setDescription(rs.getString("descricao"));
-		task.setInitialDeadline(
-				rs.getDate("prazo_inicial").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-		task.setFinalDeadline(rs.getDate("prazo_fim").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+		task.setInitialDeadline(rs.getTimestamp("prazo_inicial").toLocalDateTime());
+		task.setFinalDeadline(rs.getTimestamp("prazo_fim").toLocalDateTime());
 		task.setPoints(rs.getDouble("pontuacao"));
 		task.setEventId(rs.getLong("EVENTO_id"));
 		return task;

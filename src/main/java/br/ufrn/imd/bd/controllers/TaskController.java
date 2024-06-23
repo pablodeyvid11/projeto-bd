@@ -31,142 +31,149 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/tasks")
 public class TaskController {
 
-    @Autowired
-    private TaskService taskService;
+	@Autowired
+	private TaskService taskService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Operation(summary = "Obter task por ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task obtida com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Task não encontrada")
-    })
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTaskById(@PathVariable Long id, HttpServletRequest request) {
-        try {
-            Task task = taskService.getTaskById(id);
-            return ResponseEntity.ok(task);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Obter task por ID")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Task obtida com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Task não encontrada") })
+	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getTaskById(@PathVariable Long id, HttpServletRequest request) {
+		try {
+			Task task = taskService.getTaskById(id);
+			return ResponseEntity.ok(task);
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Obter tasks por evento")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Tasks obtidas com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Evento não encontrado")
-    })
-    @GetMapping(value = "/by-evento/{eventoId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTasksByEventoId(@PathVariable Long eventoId, HttpServletRequest request) {
-        try {
-            List<Task> tasks = taskService.getTasksByEventoId(eventoId);
-            return ResponseEntity.ok(tasks);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Obter tasks por evento")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Tasks obtidas com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Evento não encontrado") })
+	@GetMapping(value = "/by-evento/{eventoId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getTasksByEventoId(@PathVariable Long eventoId, HttpServletRequest request) {
+		try {
+			List<Task> tasks = taskService.getTasksByEventoId(eventoId);
+			return ResponseEntity.ok(tasks);
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Criar uma nova task")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Task criada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createTask(@RequestBody Task task, @RequestParam Long eventoId,
-                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                        HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            task.setEventId(eventoId);
-            taskService.createTask(task, organizadorId);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Criar uma nova task")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Task criada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createTask(@RequestBody Task task, @RequestParam Long eventoId,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			task.setEventId(eventoId);
+			taskService.createTask(task, organizadorId);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Atualizar uma task")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task atualizada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "404", description = "Task não encontrada"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Task task,
-                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                        HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            task.setId(id);
-            taskService.updateTask(task, organizadorId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Atualizar uma task")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Task atualizada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "404", description = "Task não encontrada"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Task task,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			task.setId(id);
+			taskService.updateTask(task, organizadorId);
+			return ResponseEntity.ok().build();
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Deletar uma task")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task deletada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Task não encontrada"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteTask(@PathVariable Long id,
-                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                        HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            taskService.deleteTask(id, organizadorId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Deletar uma task")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Task deletada com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Task não encontrada"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> deleteTask(@PathVariable Long id,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			taskService.deleteTask(id, organizadorId);
+			return ResponseEntity.ok().build();
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Iniciar uma task")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task iniciada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @PostMapping(value = "/iniciar", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> iniciarTask(@RequestParam Long taskId,
-                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                         HttpServletRequest request) {
-        try {
-            Long festeiroId = userService.findUserFromToken(authorizationHeader).getId();
-            taskService.iniciarTask(taskId, festeiroId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Iniciar uma task")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Task iniciada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PostMapping(value = "/iniciar", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> iniciarTask(@RequestParam Long taskId,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long festeiroId = userService.findUserFromToken(authorizationHeader).getId();
+			taskService.iniciarTask(taskId, festeiroId);
+			return ResponseEntity.ok().build();
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
+
+	@Operation(summary = "Validar uma task de um festeiro")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Task validada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PutMapping(value = "/validar", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> validarTask(@RequestParam Long taskId, @RequestParam Long festeiroId,
+			@RequestParam double pontos, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+			HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			taskService.validarTask(taskId, organizadorId, festeiroId, pontos);
+			return ResponseEntity.ok().build();
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 }

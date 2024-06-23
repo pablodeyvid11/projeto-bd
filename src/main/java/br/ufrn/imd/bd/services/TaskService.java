@@ -87,6 +87,22 @@ public class TaskService {
 		}
 	}
 
+	public void validarTask(Long taskId, Long organizadorId, Long festeiroId, double pontos) {
+		Task task = taskRepository.findById(taskId);
+		if (task == null) {
+			throw new IllegalStateException("Task não encontrada.");
+		}
+
+		FesteiroHasTask festeiroHasTask = festeiroHasTaskRepository.findByTaskIdAndFesteiroId(taskId, festeiroId);
+		if (festeiroHasTask == null) {
+			throw new IllegalStateException("Festeiro não está associado a essa task.");
+		}
+
+		festeiroHasTask.setPointsWin(pontos);
+		festeiroHasTask.setIsValidated(true);
+		festeiroHasTaskRepository.update(festeiroHasTask);
+	}
+
 	public void iniciarTask(Long taskId, Long festeiroId) {
 		Task task = taskRepository.findById(taskId);
 		if (task == null) {
@@ -111,7 +127,7 @@ public class TaskService {
 		FesteiroHasTask festeiroHasTask = new FesteiroHasTask();
 		festeiroHasTask.setFesteiroId(festeiroId);
 		festeiroHasTask.setTaskId(taskId);
-		festeiroHasTask.setPointsWin(null);
+		festeiroHasTask.setPointsWin(0.0);
 		festeiroHasTask.setIsValidated(false);
 
 		festeiroHasTaskRepository.save(festeiroHasTask);
