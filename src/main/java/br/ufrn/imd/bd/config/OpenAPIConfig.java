@@ -7,9 +7,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityScheme.In;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
@@ -22,7 +28,7 @@ public class OpenAPIConfig {
 	private String prodUrl;
 
 	@Bean
-	OpenAPI myOpenAPI() {
+	OpenAPI festivalleAPI() {
 		Server devServer = new Server();
 		devServer.setUrl(devUrl);
 		devServer.setDescription("Server URL in Development environment");
@@ -42,6 +48,32 @@ public class OpenAPIConfig {
 				.description("This API exposes endpoints to manage the Festivalle ecosystem.")
 				.termsOfService("https://www.festivalle.com/terms").license(mitLicense);
 
-		return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
+		SecurityScheme securityScheme = new SecurityScheme().type(Type.HTTP).scheme("bearer").bearerFormat("JWT")
+				.in(In.HEADER).name("Authorization");
+
+		OpenAPI openAPI = new OpenAPI().info(info).addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+				.components(new io.swagger.v3.oas.models.Components().addSecuritySchemes("bearerAuth", securityScheme))
+				.servers(List.of(devServer, prodServer));
+
+		Paths paths = openAPI.getPaths();
+		if (paths != null) {
+			paths.forEach((key, pathItem) -> {
+				if (key.equals("/signin") || key.equals("/signup")) {
+					pathItem.readOperations().forEach(operation -> removeSecurity(operation));
+				} else {
+					pathItem.readOperations().forEach(operation -> addSecurity(operation));
+				}
+			});
+		}
+
+		return openAPI;
+	}
+
+	private void removeSecurity(Operation operation) {
+		operation.setSecurity(List.of());
+	}
+
+	private void addSecurity(Operation operation) {
+		operation.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
 	}
 }

@@ -7,11 +7,11 @@ import br.ufrn.imd.bd.model.Estabelecimento;
 public interface EstabelecimentoRepository extends RepositoryGeneric {
 	List<Estabelecimento> findAll();
 
-	Estabelecimento findById(Long cnpj);
+	Estabelecimento findById(String cnpj);
 
 	void save(Estabelecimento estabelecimento);
 
 	void update(Estabelecimento estabelecimento);
 
-	void delete(Long cnpj);
+	void delete(String cnpj);
 }

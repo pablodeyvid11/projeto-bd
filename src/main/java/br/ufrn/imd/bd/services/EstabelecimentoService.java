@@ -22,12 +22,13 @@ public class EstabelecimentoService {
         return estabelecimentoRepository.findAll();
     }
 
-    public Estabelecimento getEstabelecimentoById(Long cnpj) {
+    public Estabelecimento getEstabelecimentoById(String cnpj) {
         return estabelecimentoRepository.findById(cnpj);
     }
 
     public void createEstabelecimento(Estabelecimento estabelecimento, Long organizadorId) {
         if (organizadorRepository.existsById(organizadorId)) {
+        	estabelecimento.setOrganizadorCriadorId(organizadorId);
             estabelecimentoRepository.save(estabelecimento);
         } else {
             throw new IllegalStateException("Somente organizadores podem criar estabelecimentos.");
@@ -42,7 +43,7 @@ public class EstabelecimentoService {
         }
     }
 
-    public void deleteEstabelecimento(Long cnpj, Long organizadorId) {
+    public void deleteEstabelecimento(String cnpj, Long organizadorId) {
         if (organizadorRepository.existsById(organizadorId)) {
             estabelecimentoRepository.delete(cnpj);
         } else {

@@ -5,11 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.ufrn.imd.bd.model.Estabelecimento;
 import br.ufrn.imd.bd.model.EstabelecimentoHasOrganizadorHasEvento;
 import br.ufrn.imd.bd.model.Evento;
 import br.ufrn.imd.bd.repository.EstabelecimentoHasOrganizadorHasEventoRepositoryImpl;
 import br.ufrn.imd.bd.repository.EventoRepositoryImpl;
 import br.ufrn.imd.bd.repository.OrganizadorRepositoryImpl;
+import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoRepository;
 
 @Service
 public class EventoService {
@@ -18,6 +20,9 @@ public class EventoService {
 
 	@Autowired
 	private EstabelecimentoHasOrganizadorHasEventoRepositoryImpl estabelecimentoEventoOrganizadorRepository;
+
+	@Autowired
+	private EstabelecimentoRepository estabelecimentoRepository;
 
 	@Autowired
 	private OrganizadorRepositoryImpl organizadorRepository;
@@ -29,8 +34,18 @@ public class EventoService {
 	public Evento getEventoById(Long id) {
 		return eventoRepository.findById(id);
 	}
-	
-	public void createEvento(Evento evento, Long organizadorId, Long estabelecimentoCnpj) {
+
+	public void createEvento(Evento evento, Long organizadorId, String estabelecimentoCnpj) {
+
+		Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoCnpj);
+		if (estabelecimento == null) {
+			throw new IllegalStateException("Estabelecimento não encontrado.");
+		}
+
+		if (!estabelecimento.getOrganizadorCriadorId().equals(organizadorId)) {
+			throw new IllegalStateException("Usuário não é dono do estabelecimento.");
+		}
+
 		if (organizadorRepository.existsById(organizadorId)) {
 			evento.setId(eventoRepository.getNextId());
 			eventoRepository.save(evento);
@@ -41,6 +56,25 @@ public class EventoService {
 			estabelecimentoEventoOrganizadorRepository.save(relacao);
 		} else {
 			throw new IllegalStateException("Somente organizadores podem criar eventos.");
+		}
+	}
+
+	public void addOrganizadorToEvento(Long eventoId, Long organizadorId, Long donoId) {
+		Evento evento = eventoRepository.findById(eventoId);
+		if (evento == null) {
+			throw new IllegalStateException("Evento não encontrado.");
+		}
+
+		if (!estabelecimentoEventoOrganizadorRepository.isEventoCreatedByOrganizador(eventoId, organizadorId)) {
+			throw new IllegalStateException("Usuário não é dono do estabelecimento.");
+		}
+
+		List<EstabelecimentoHasOrganizadorHasEvento> eoeList = estabelecimentoEventoOrganizadorRepository
+				.findAllByEventoOrganizador(eventoId, organizadorId);
+
+		for (EstabelecimentoHasOrganizadorHasEvento eoe : eoeList) {
+			estabelecimentoEventoOrganizadorRepository.addOrganizadorToEvento(eoe.getEstabelecimentoId(), organizadorId,
+					eventoId);
 		}
 	}
 

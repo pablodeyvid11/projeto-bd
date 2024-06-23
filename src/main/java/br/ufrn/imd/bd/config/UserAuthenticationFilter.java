@@ -23,29 +23,23 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private JwtTokenService jwtTokenService; // Service que definimos anteriormente
+	private JwtTokenService jwtTokenService;
 
 	@Autowired
-	private UserRepository userRepository; // Repository que definimos anteriormente
+	private UserRepository userRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// Verifica se o endpoint requer autenticação antes de processar a requisição
 		if (checkIfEndpointIsNotPublic(request)) {
-			String token = recoveryToken(request); // Recupera o token do cabeçalho Authorization da requisição
+			String token = recoveryToken(request);
 			if (token != null) {
-				String subject = jwtTokenService.getSubjectFromToken(token); // Obtém o assunto (neste caso, o nome de
-																				// usuário) do token
-				User user = userRepository.findByEmail(subject); // Busca o usuário pelo email (que é o assunto
-																			// do token)
-				UserDetailsImpl userDetails = new UserDetailsImpl(user); // Cria um UserDetails com o usuário encontrado
-
-				// Cria um objeto de autenticação do Spring Security
+				String subject = jwtTokenService.getSubjectFromToken(token);
+				User user = userRepository.findByEmail(subject);
+				UserDetailsImpl userDetails = new UserDetailsImpl(user);
 				Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null,
 						userDetails.getAuthorities());
 
-				// Define o objeto de autenticação no contexto de segurança do Spring Security
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} else {
 				throw new RuntimeException("O token está ausente.");

@@ -1,12 +1,18 @@
 package br.ufrn.imd.bd.services;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.ufrn.imd.bd.model.FesteiroHasTask;
+import br.ufrn.imd.bd.model.Ingresso;
 import br.ufrn.imd.bd.model.Task;
 import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoHasOrganizadorHasEventoRepository;
+import br.ufrn.imd.bd.repository.interfaces.FesteiroHasTaskRepository;
+import br.ufrn.imd.bd.repository.interfaces.IngressoRepository;
 import br.ufrn.imd.bd.repository.interfaces.OrganizadorRepository;
 import br.ufrn.imd.bd.repository.interfaces.TaskRepository;
 
@@ -21,6 +27,12 @@ public class TaskService {
 
 	@Autowired
 	private OrganizadorRepository organizadorRepository;
+
+	@Autowired
+	private FesteiroHasTaskRepository festeiroHasTaskRepository;
+
+	@Autowired
+	private IngressoRepository ingressoRepository;
 
 	public List<Task> getAllTasks() {
 		return taskRepository.findAll();
@@ -75,4 +87,33 @@ public class TaskService {
 		}
 	}
 
+	public void iniciarTask(Long taskId, Long festeiroId) {
+		Task task = taskRepository.findById(taskId);
+		if (task == null) {
+			throw new IllegalStateException("Task não encontrada.");
+		}
+
+		Date finalDeadline = Date.from(task.getFinalDeadline().atZone(ZoneId.systemDefault()).toInstant());
+
+		if (new Date().after(finalDeadline)) {
+			throw new IllegalStateException("O prazo para iniciar esta tarefa já passou.");
+		}
+
+		Ingresso ingresso = ingressoRepository.findByEventoIdAndFesteiroId(task.getEventId(), festeiroId);
+		if (ingresso == null) {
+			throw new IllegalStateException("Festeiro não possui ingresso para este evento.");
+		}
+
+		if (festeiroHasTaskRepository.existsByFesteiroIdAndTaskId(festeiroId, taskId)) {
+			throw new IllegalStateException("Festeiro já iniciou esta tarefa.");
+		}
+
+		FesteiroHasTask festeiroHasTask = new FesteiroHasTask();
+		festeiroHasTask.setFesteiroId(festeiroId);
+		festeiroHasTask.setTaskId(taskId);
+		festeiroHasTask.setPointsWin(null);
+		festeiroHasTask.setIsValidated(false);
+
+		festeiroHasTaskRepository.save(festeiroHasTask);
+	}
 }

@@ -58,4 +58,30 @@ public class IngressoRepositoryImpl implements IngressoRepository {
 		}
 		return 0;
 	}
+
+	@Override
+	public Ingresso findByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) {
+		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ? AND FESTEIRO_id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, eventoId);
+			ps.setLong(2, festeiroId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapRowToIngresso(rs);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private Ingresso mapRowToIngresso(ResultSet rs) throws SQLException {
+		Ingresso ingresso = new Ingresso();
+		ingresso.setToken(rs.getString("token"));
+		ingresso.setEventoId(rs.getLong("EVENTO_id"));
+		ingresso.setFesteiroId(rs.getLong("FESTEIRO_id"));
+		return ingresso;
+	}
 }

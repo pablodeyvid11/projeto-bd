@@ -8,18 +8,20 @@ public class Estabelecimento {
 	private String addressRua;
 	private String addressCep;
 	private String addressNumero;
+	private Long organizadorCriadorId;
 
 	public Estabelecimento() {
 	}
 
 	public Estabelecimento(String cnpj, String name, String addressBairro, String addressRua, String addressCep,
-			String addressNumero) {
+			String addressNumero, Long organizadorCriadorId) {
 		this.cnpj = cnpj;
 		this.name = name;
 		this.addressBairro = addressBairro;
 		this.addressRua = addressRua;
 		this.addressCep = addressCep;
 		this.addressNumero = addressNumero;
+		this.organizadorCriadorId = organizadorCriadorId;
 	}
 
 	public String getCnpj() {
@@ -70,4 +72,11 @@ public class Estabelecimento {
 		this.addressNumero = addressNumero;
 	}
 
+	public Long getOrganizadorCriadorId() {
+		return organizadorCriadorId;
+	}
+
+	public void setOrganizadorCriadorId(Long organizadorCriadorId) {
+		this.organizadorCriadorId = organizadorCriadorId;
+	}
 }
