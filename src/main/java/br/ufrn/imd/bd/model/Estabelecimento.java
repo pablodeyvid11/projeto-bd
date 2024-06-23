@@ -1,7 +1,7 @@
 package br.ufrn.imd.bd.model;
 
 public class Estabelecimento {
-	private Long id;
+
 	private String cnpj;
 	private String name;
 	private String addressBairro;
@@ -12,23 +12,14 @@ public class Estabelecimento {
 	public Estabelecimento() {
 	}
 
-	public Estabelecimento(Long id, String cnpj, String name, String addressBairro, String addressRua,
-			String addressCep, String addressNumero) {
-		this.id = id;
+	public Estabelecimento(String cnpj, String name, String addressBairro, String addressRua, String addressCep,
+			String addressNumero) {
 		this.cnpj = cnpj;
 		this.name = name;
 		this.addressBairro = addressBairro;
 		this.addressRua = addressRua;
 		this.addressCep = addressCep;
 		this.addressNumero = addressNumero;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getCnpj() {

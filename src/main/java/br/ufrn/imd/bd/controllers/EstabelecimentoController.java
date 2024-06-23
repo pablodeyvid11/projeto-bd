@@ -1,8 +1,9 @@
 package br.ufrn.imd.bd.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,52 +12,52 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.ufrn.imd.bd.model.Evento;
-import br.ufrn.imd.bd.services.EventoService;
+import br.ufrn.imd.bd.model.Estabelecimento;
+import br.ufrn.imd.bd.services.EstabelecimentoService;
 import br.ufrn.imd.bd.services.UserService;
 
 @RestController
-@RequestMapping("/eventos")
-public class EventoController {
+@RequestMapping("/estabelecimentos")
+public class EstabelecimentoController {
 
 	@Autowired
-	private EventoService eventoService;
+	private EstabelecimentoService estabelecimentoService;
 
 	@Autowired
 	private UserService userService;
 
 	@GetMapping
-	public ResponseEntity<?> getAllEventos() {
-		return ResponseEntity.ok(eventoService.getAllEventos());
+	public List<Estabelecimento> getAllEstabelecimentos() {
+		return estabelecimentoService.getAllEstabelecimentos();
 	}
 
-	@GetMapping("/{id}")
-	public Evento getEventoById(@PathVariable Long id) {
-		return eventoService.getEventoById(id);
+	@GetMapping("/{cnpj}")
+	public Estabelecimento getEstabelecimentoById(@PathVariable Long cnpj) {
+		return estabelecimentoService.getEstabelecimentoById(cnpj);
 	}
 
 	@PostMapping
-	public void createEvento(@RequestBody Evento evento, @RequestParam Long estabelecimentoCnpj,
+	public void createEstabelecimento(@RequestBody Estabelecimento estabelecimento,
 			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-		eventoService.createEvento(evento, organizadorId, estabelecimentoCnpj);
+		estabelecimentoService.createEstabelecimento(estabelecimento, organizadorId);
 	}
 
-	@PutMapping("/{id}")
-	public void updateEvento(@PathVariable Long id, @RequestBody Evento evento,
+	@PutMapping("/{cnpj}")
+	public void updateEstabelecimento(@PathVariable Long cnpj, @RequestBody Estabelecimento estabelecimento,
 			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+
 		Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-		evento.setId(id);
-		eventoService.updateEvento(evento, organizadorId);
+		estabelecimento.setCnpj(cnpj + "");
+		estabelecimentoService.updateEstabelecimento(estabelecimento, organizadorId);
 	}
 
-	@DeleteMapping("/{id}")
-	public void deleteEvento(@PathVariable Long id,
+	@DeleteMapping("/{cnpj}")
+	public void deleteEstabelecimento(@PathVariable Long cnpj,
 			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-		eventoService.deleteEvento(id, organizadorId);
+		estabelecimentoService.deleteEstabelecimento(cnpj, organizadorId);
 	}
 }

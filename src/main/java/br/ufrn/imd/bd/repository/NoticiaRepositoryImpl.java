@@ -32,23 +32,104 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 		return dataSource;
 	}
 
-    @Override
-    public List<Noticia> findAllByEventoId(Long eventoId) {
-        List<Noticia> noticias = new ArrayList<>();
-        String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ?", getTableName());
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, eventoId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    noticias.add(mapRowToNoticia(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return noticias;
-    }
+	@Override
+	public List<Noticia> findAllByEventoId(Long eventoId) {
+		List<Noticia> noticias = new ArrayList<>();
+		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, eventoId);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					noticias.add(mapRowToNoticia(rs));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return noticias;
+	}
+
+	@Override
+	public List<Noticia> findAll() {
+		List<Noticia> noticias = new ArrayList<>();
+		String sql = String.format("SELECT * FROM %s", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				noticias.add(mapRowToNoticia(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return noticias;
+	}
+
+	@Override
+	public Noticia findById(Long id) {
+		String sql = String.format("SELECT * FROM %s WHERE id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, id);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapRowToNoticia(rs);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public void save(Noticia noticia) {
+		String sql = String.format(
+				"INSERT INTO %s (id, titulo, data_horario, texto, midia_path, EVENTO_id) VALUES (?, ?, ?, ?, ?, ?)",
+				getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, noticia.getId());
+			ps.setString(2, noticia.getTitle());
+			ps.setDate(3, convertToSqlDate(noticia.getDate()));
+			ps.setString(4, noticia.getText());
+			ps.setString(5, noticia.getMidiaPath());
+			ps.setLong(6, noticia.getEventoId());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void update(Noticia noticia) {
+		String sql = String.format("UPDATE %s SET titulo = ?, data_horario = ?, texto = ?, midia_path = ? WHERE id = ?",
+				getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setString(1, noticia.getTitle());
+			ps.setDate(2, convertToSqlDate(noticia.getDate()));
+			ps.setString(3, noticia.getText());
+			ps.setString(4, noticia.getMidiaPath());
+			ps.setLong(5, noticia.getId());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void delete(Long id) {
+		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, id);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private Noticia mapRowToNoticia(ResultSet rs) throws SQLException {
 		Noticia noticia = new Noticia();

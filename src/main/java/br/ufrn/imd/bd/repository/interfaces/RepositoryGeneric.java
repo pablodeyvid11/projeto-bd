@@ -1,9 +1,12 @@
 package br.ufrn.imd.bd.repository.interfaces;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.sql.DataSource;
 
@@ -43,4 +46,9 @@ public interface RepositoryGeneric {
 		}
 		return false;
 	}
+	
+	public default Date convertToSqlDate(LocalDateTime dateTime) {
+        LocalDate localDate = dateTime.toLocalDate();
+        return Date.valueOf(localDate);
+    }
 }
