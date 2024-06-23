@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.controllers;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class TaskController {
 		try {
 			Task task = taskService.getTaskById(id);
 			return ResponseEntity.ok(task);
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
@@ -62,6 +66,9 @@ public class TaskController {
 		try {
 			List<Task> tasks = taskService.getTasksByEventoId(eventoId);
 			return ResponseEntity.ok(tasks);
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
@@ -84,6 +91,9 @@ public class TaskController {
 			task.setEventId(eventoId);
 			taskService.createTask(task, organizadorId);
 			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
@@ -106,6 +116,9 @@ public class TaskController {
 			task.setId(id);
 			taskService.updateTask(task, organizadorId);
 			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
@@ -126,6 +139,9 @@ public class TaskController {
 			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
 			taskService.deleteTask(id, organizadorId);
 			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
@@ -146,6 +162,9 @@ public class TaskController {
 			Long festeiroId = userService.findUserFromToken(authorizationHeader).getId();
 			taskService.iniciarTask(taskId, festeiroId);
 			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
@@ -168,6 +187,9 @@ public class TaskController {
 			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
 			taskService.validarTask(taskId, organizadorId, festeiroId, pontos);
 			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));

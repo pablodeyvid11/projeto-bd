@@ -10,21 +10,21 @@ import javax.sql.DataSource;
 import br.ufrn.imd.bd.model.User;
 
 public interface UserRepository extends RepositoryGeneric {
-	User findById(Long id);
+	User findById(Long id) throws SQLException;
 
-	User findByEmail(String email);
+	User findByEmail(String email) throws SQLException;
 
-	User findByUsername(String email);
+	User findByUsername(String email) throws SQLException;
 
-	void update(User userDto);
+	void update(User userDto) throws SQLException;
 
-	void save(User user);
+	void save(User user) throws SQLException;
 
-	void delete(Long id);
+	void delete(Long id) throws SQLException;
 
 	DataSource getDatasource();
 
-	public default Long getNextId() {
+	public default Long getNextId() throws SQLException {
 		String sql = String.format("SELECT MAX(id) AS max_id FROM %s", getTableName());
 
 		try (Connection connection = getDatasource().getConnection();
@@ -36,6 +36,7 @@ public interface UserRepository extends RepositoryGeneric {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return 1L;
 	}

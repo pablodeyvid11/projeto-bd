@@ -32,7 +32,7 @@ public class EstabelecimentoHasOrganizadorHasEventoRepositoryImpl
 	}
 
 	@Override
-	public void save(EstabelecimentoHasOrganizadorHasEvento relacao) {
+	public void save(EstabelecimentoHasOrganizadorHasEvento relacao) throws SQLException {
 		String sql = String.format("INSERT INTO %s (ESTABELECIMENTO_cnpj, ORGANIZADOR_id, EVENTO_id) VALUES (?, ?, ?)",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -43,11 +43,12 @@ public class EstabelecimentoHasOrganizadorHasEventoRepositoryImpl
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void deleteByEventoId(Long eventoId) {
+	public void deleteByEventoId(Long eventoId) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE EVENTO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -55,11 +56,12 @@ public class EstabelecimentoHasOrganizadorHasEventoRepositoryImpl
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean isEventoCreatedByOrganizador(Long eventoId, Long organizadorId) {
+	public boolean isEventoCreatedByOrganizador(Long eventoId, Long organizadorId) throws SQLException {
 		String sql = String.format("SELECT COUNT(*) FROM %s WHERE EVENTO_id = ? AND ORGANIZADOR_id = ?",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -73,6 +75,7 @@ public class EstabelecimentoHasOrganizadorHasEventoRepositoryImpl
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return false;
 	}

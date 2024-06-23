@@ -29,7 +29,7 @@ public class IngressoRepositoryImpl implements IngressoRepository {
 	}
 
 	@Override
-	public void save(Ingresso ingresso) {
+	public void save(Ingresso ingresso) throws SQLException {
 		String sql = String.format("INSERT INTO %s (token, EVENTO_id, FESTEIRO_id) VALUES (?, ?, ?)", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -39,11 +39,12 @@ public class IngressoRepositoryImpl implements IngressoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public int countByEventoId(Long eventoId) {
+	public int countByEventoId(Long eventoId) throws SQLException {
 		String sql = String.format("SELECT COUNT(*) FROM %s WHERE EVENTO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -55,12 +56,13 @@ public class IngressoRepositoryImpl implements IngressoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return 0;
 	}
 
 	@Override
-	public Ingresso findByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) {
+	public Ingresso findByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ? AND FESTEIRO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -73,6 +75,7 @@ public class IngressoRepositoryImpl implements IngressoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}

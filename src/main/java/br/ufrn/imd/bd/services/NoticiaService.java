@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,19 +24,19 @@ public class NoticiaService {
 	@Autowired
 	private OrganizadorRepository organizadorRepository;
 
-	public List<Noticia> getNoticiasByEventoId(Long eventoId) {
+	public List<Noticia> getNoticiasByEventoId(Long eventoId) throws SQLException {
 		return noticiaRepository.findAllByEventoId(eventoId);
 	}
 
-	public List<Noticia> getAllNoticias() {
+	public List<Noticia> getAllNoticias() throws SQLException {
 		return noticiaRepository.findAll();
 	}
 
-	public Noticia getNoticiaById(Long id) {
+	public Noticia getNoticiaById(Long id) throws SQLException {
 		return noticiaRepository.findById(id);
 	}
 
-	public void createNoticia(Noticia noticia, Long organizadorId) {
+	public void createNoticia(Noticia noticia, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(noticia.getEventoId(),
 					organizadorId)) {
@@ -50,7 +51,7 @@ public class NoticiaService {
 		}
 	}
 
-	public void updateNoticia(Noticia noticia, Long organizadorId) {
+	public void updateNoticia(Noticia noticia, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(noticia.getEventoId(),
 					organizadorId)) {
@@ -64,7 +65,7 @@ public class NoticiaService {
 		}
 	}
 
-	public void deleteNoticia(Long noticiaId, Long organizadorId) {
+	public void deleteNoticia(Long noticiaId, Long organizadorId) throws SQLException {
 		Noticia noticia = noticiaRepository.findById(noticiaId);
 		if (noticia != null && organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(noticia.getEventoId(),

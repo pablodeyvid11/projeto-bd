@@ -15,7 +15,7 @@ public interface RepositoryGeneric {
 
 	DataSource getDatasource();
 
-	public default Long getNextId() {
+	public default Long getNextId() throws SQLException {
 		String sql = String.format("SELECT MAX(id) AS max_id FROM %s", getTableName());
 
 		try (Connection connection = getDatasource().getConnection();
@@ -27,11 +27,12 @@ public interface RepositoryGeneric {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return 1L;
 	}
 
-	public default boolean existsById(Long id) {
+	public default boolean existsById(Long id) throws SQLException {
 		String sql = String.format("SELECT COUNT(*) FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = getDatasource().getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -43,12 +44,13 @@ public interface RepositoryGeneric {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return false;
 	}
-	
+
 	public default Date convertToSqlDate(LocalDateTime dateTime) {
-        LocalDate localDate = dateTime.toLocalDate();
-        return Date.valueOf(localDate);
-    }
+		LocalDate localDate = dateTime.toLocalDate();
+		return Date.valueOf(localDate);
+	}
 }

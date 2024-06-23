@@ -28,7 +28,7 @@ public class VendedorRepositoryImpl implements VendedorRepository {
 	}
 
 	@Override
-	public void save(Long id, String descricao) {
+	public void save(Long id, String descricao) throws SQLException {
 		String sql = String.format("INSERT INTO %s (id, descricao) VALUES (?, ?)", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -37,10 +37,11 @@ public class VendedorRepositoryImpl implements VendedorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
-	public void updateVendedor(Long id, String descricao) {
+	public void updateVendedor(Long id, String descricao) throws SQLException {
 		String sql = String.format("UPDATE %s SET descricao = ? WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -49,10 +50,11 @@ public class VendedorRepositoryImpl implements VendedorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
-	public void deleteVendedor(Long id) {
+	public void deleteVendedor(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -60,6 +62,7 @@ public class VendedorRepositoryImpl implements VendedorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 }

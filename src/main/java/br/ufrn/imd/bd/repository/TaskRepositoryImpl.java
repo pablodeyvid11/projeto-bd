@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 	}
 
 	@Override
-	public List<Task> findAllByEventoId(Long id) {
+	public List<Task> findAllByEventoId(Long id) throws SQLException {
 		List<Task> tasks = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = %d", getTableName(), id);
 
@@ -46,12 +45,13 @@ public class TaskRepositoryImpl implements TaskRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return tasks;
 	}
 
 	@Override
-	public List<Task> findAll() {
+	public List<Task> findAll() throws SQLException {
 		List<Task> tasks = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -62,12 +62,13 @@ public class TaskRepositoryImpl implements TaskRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return tasks;
 	}
 
 	@Override
-	public Task findById(Long id) {
+	public Task findById(Long id) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,12 +80,13 @@ public class TaskRepositoryImpl implements TaskRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(Task task) {
+	public void save(Task task) throws SQLException {
 		String sql = String.format(
 				"INSERT INTO %s (id, nome, descricao, pontuacao, prazo_inicial, prazo_fim, EVENTO_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
 				getTableName());
@@ -100,11 +102,12 @@ public class TaskRepositoryImpl implements TaskRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void update(Task task) {
+	public void update(Task task) throws SQLException {
 		String sql = String.format(
 				"UPDATE %s SET nome = ?, descricao = ?, pontuacao = ?, prazo_inicial = ?, prazo_fim = ? WHERE id = ?",
 				getTableName());
@@ -119,11 +122,12 @@ public class TaskRepositoryImpl implements TaskRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -131,6 +135,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

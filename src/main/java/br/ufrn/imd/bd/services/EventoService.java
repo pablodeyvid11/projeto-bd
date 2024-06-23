@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +28,15 @@ public class EventoService {
 	@Autowired
 	private OrganizadorRepositoryImpl organizadorRepository;
 
-	public List<Evento> getAllEventos() {
+	public List<Evento> getAllEventos() throws SQLException {
 		return eventoRepository.findAll();
 	}
 
-	public Evento getEventoById(Long id) {
+	public Evento getEventoById(Long id) throws SQLException {
 		return eventoRepository.findById(id);
 	}
 
-	public void createEvento(Evento evento, Long organizadorId, String estabelecimentoCnpj) {
+	public void createEvento(Evento evento, Long organizadorId, String estabelecimentoCnpj) throws SQLException {
 
 		Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoCnpj);
 		if (estabelecimento == null) {
@@ -59,7 +60,7 @@ public class EventoService {
 		}
 	}
 
-	public void addOrganizadorToEvento(Long eventoId, Long organizadorId, Long donoId) {
+	public void addOrganizadorToEvento(Long eventoId, Long organizadorId, Long donoId) throws SQLException {
 		Evento evento = eventoRepository.findById(eventoId);
 		if (evento == null) {
 			throw new IllegalStateException("Evento não encontrado.");
@@ -78,7 +79,7 @@ public class EventoService {
 		}
 	}
 
-	public void updateEvento(Evento evento, Long organizadorId) {
+	public void updateEvento(Evento evento, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			eventoRepository.update(evento);
 		} else {
@@ -86,7 +87,7 @@ public class EventoService {
 		}
 	}
 
-	public void deleteEvento(Long eventoId, Long organizadorId) {
+	public void deleteEvento(Long eventoId, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			estabelecimentoEventoOrganizadorRepository.deleteByEventoId(eventoId);
 			eventoRepository.delete(eventoId);

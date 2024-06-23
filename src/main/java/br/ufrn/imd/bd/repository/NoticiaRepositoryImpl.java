@@ -33,7 +33,7 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 	}
 
 	@Override
-	public List<Noticia> findAllByEventoId(Long eventoId) {
+	public List<Noticia> findAllByEventoId(Long eventoId) throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -46,12 +46,13 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return noticias;
 	}
 
 	@Override
-	public List<Noticia> findAll() {
+	public List<Noticia> findAll() throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -62,12 +63,13 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return noticias;
 	}
 
 	@Override
-	public Noticia findById(Long id) {
+	public Noticia findById(Long id) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,12 +81,13 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(Noticia noticia) {
+	public void save(Noticia noticia) throws SQLException {
 		String sql = String.format(
 				"INSERT INTO %s (id, titulo, data_horario, texto, midia_path, EVENTO_id) VALUES (?, ?, ?, ?, ?, ?)",
 				getTableName());
@@ -99,11 +102,12 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void update(Noticia noticia) {
+	public void update(Noticia noticia) throws SQLException {
 		String sql = String.format("UPDATE %s SET titulo = ?, data_horario = ?, texto = ?, midia_path = ? WHERE id = ?",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -116,11 +120,12 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -128,6 +133,7 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

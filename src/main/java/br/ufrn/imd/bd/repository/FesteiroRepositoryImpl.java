@@ -28,7 +28,7 @@ public class FesteiroRepositoryImpl implements FesteiroRepository {
 	}
 
 	@Override
-	public void save(Long id) {
+	public void save(Long id) throws SQLException {
 		String sql = String.format("INSERT INTO %s (id) VALUES (?)", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -36,11 +36,12 @@ public class FesteiroRepositoryImpl implements FesteiroRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void deleteFesteiro(Long id) {
+	public void deleteFesteiro(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -48,6 +49,7 @@ public class FesteiroRepositoryImpl implements FesteiroRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 }

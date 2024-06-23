@@ -30,7 +30,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findById(Long id) {
+	public User findById(Long id) throws SQLException {
 		try (Connection connection = dataSource.getConnection()) {
 
 			String SQL = String.format("SELECT * FROM %s WHERE id = ?", getTableName());
@@ -52,12 +52,13 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(User user) {
+	public void save(User user) throws SQLException {
 		String sql = "INSERT INTO USUARIO (id, cpf, email, telefone, nome, senha) VALUES (?, ?, ?, ?, ?, ?)";
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -70,11 +71,12 @@ public class UserRepositoryImpl implements UserRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public User findByEmail(String email) {
+	public User findByEmail(String email) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE email = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -85,12 +87,13 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void update(User user) {
+	public void update(User user) throws SQLException {
 		String sql = String.format(
 				"UPDATE %s SET cpf = ?, email = ?, telefone = ?, nome = ?, senha = MD5(?) WHERE id = ?",
 				getTableName());
@@ -105,11 +108,12 @@ public class UserRepositoryImpl implements UserRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -117,6 +121,7 @@ public class UserRepositoryImpl implements UserRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -132,7 +137,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public User findByUsername(String email) {
+	public User findByUsername(String email) throws SQLException {
 		return findByEmail(email);
 	}
 

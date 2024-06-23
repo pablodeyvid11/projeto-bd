@@ -31,7 +31,7 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 	}
 
 	@Override
-	public List<VendedorProdutos> findAll() {
+	public List<VendedorProdutos> findAll() throws SQLException {
 		List<VendedorProdutos> produtos = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -42,12 +42,14 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+
+			throw e;
 		}
 		return produtos;
 	}
 
 	@Override
-	public List<VendedorProdutos> findByVendedorId(Long vendedorId) {
+	public List<VendedorProdutos> findByVendedorId(Long vendedorId) throws SQLException {
 		List<VendedorProdutos> produtos = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE VENDEDOR_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -60,12 +62,13 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return produtos;
 	}
 
 	@Override
-	public VendedorProdutos findByNomeAndVendedorId(String nome, Long vendedorId) {
+	public VendedorProdutos findByNomeAndVendedorId(String nome, Long vendedorId) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE produto_nome = ? AND VENDEDOR_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -78,12 +81,13 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(VendedorProdutos produto) {
+	public void save(VendedorProdutos produto) throws SQLException {
 		String sql = String.format("INSERT INTO %s (VENDEDOR_id, produto_nome, descricao) VALUES (?, ?, ?)",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -94,11 +98,12 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void update(VendedorProdutos produto) {
+	public void update(VendedorProdutos produto) throws SQLException {
 		String sql = String.format("UPDATE %s SET descricao = ? WHERE VENDEDOR_id = ? AND produto_nome = ?",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -109,11 +114,12 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void delete(String nome, Long vendedorId) {
+	public void delete(String nome, Long vendedorId) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE produto_nome = ? AND VENDEDOR_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -122,6 +128,7 @@ public class ProdutoRespositoryImpl implements ProdutoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

@@ -1,6 +1,7 @@
 package br.ufrn.imd.bd.config;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,12 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 			String token = recoveryToken(request);
 			if (token != null) {
 				String subject = jwtTokenService.getSubjectFromToken(token);
-				User user = userRepository.findByEmail(subject);
+				User user;
+				try {
+					user = userRepository.findByEmail(subject);
+				} catch (SQLException e) {
+					throw new RuntimeException("Usuário inconsistente");
+				}
 				UserDetailsImpl userDetails = new UserDetailsImpl(user);
 				Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null,
 						userDetails.getAuthorities());

@@ -1,5 +1,7 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,11 +42,11 @@ public class UserService {
 	@Autowired
 	private JwtTokenService jwtTokenService;
 
-	public User findByEmail(String email) {
+	public User findByEmail(String email) throws SQLException {
 		return userRepository.findByEmail(email);
 	}
 
-	public User signon(UserDTO sigonRecord) {
+	public User signon(UserDTO sigonRecord) throws SQLException {
 		User user = new User();
 		Long nextId = userRepository.getNextId();
 
@@ -68,7 +70,7 @@ public class UserService {
 		return user;
 	}
 
-	public RecoveryJWTDTO login(SigninDTO siginRecord) {
+	public RecoveryJWTDTO login(SigninDTO siginRecord) throws SQLException {
 
 		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 				siginRecord.email(), siginRecord.password());
@@ -80,7 +82,7 @@ public class UserService {
 		return new RecoveryJWTDTO(jwtTokenService.generateToken(userDetails));
 	}
 
-	public void update(UserDTO sigonRecord) {
+	public void update(UserDTO sigonRecord) throws SQLException {
 		User user = userRepository.findById(sigonRecord.id());
 		if (user == null) {
 			throw new IllegalStateException("User not found");
@@ -104,7 +106,7 @@ public class UserService {
 		}
 	}
 
-	public User findUserFromToken(String authorizationHeader) {
+	public User findUserFromToken(String authorizationHeader) throws SQLException {
 		String token = null;
 
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -116,7 +118,7 @@ public class UserService {
 		return userRepository.findByEmail(username);
 	}
 
-	public void deleteById(Long id) {
+	public void deleteById(Long id) throws SQLException {
 		if (festeiroRepository.existsById(id)) {
 			festeiroRepository.deleteFesteiro(id);
 		}

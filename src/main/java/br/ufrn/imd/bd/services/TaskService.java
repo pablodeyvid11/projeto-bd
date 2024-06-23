@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -34,19 +35,19 @@ public class TaskService {
 	@Autowired
 	private IngressoRepository ingressoRepository;
 
-	public List<Task> getAllTasks() {
+	public List<Task> getAllTasks() throws SQLException {
 		return taskRepository.findAll();
 	}
 
-	public List<Task> getTasksByEventoId(Long eventoId) {
+	public List<Task> getTasksByEventoId(Long eventoId) throws SQLException {
 		return taskRepository.findAllByEventoId(eventoId);
 	}
 
-	public Task getTaskById(Long id) {
+	public Task getTaskById(Long id) throws SQLException {
 		return taskRepository.findById(id);
 	}
 
-	public void createTask(Task task, Long organizadorId) {
+	public void createTask(Task task, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(task.getEventId(),
 					organizadorId)) {
@@ -60,7 +61,7 @@ public class TaskService {
 		}
 	}
 
-	public void updateTask(Task task, Long organizadorId) {
+	public void updateTask(Task task, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(task.getEventId(),
 					organizadorId)) {
@@ -73,7 +74,7 @@ public class TaskService {
 		}
 	}
 
-	public void deleteTask(Long taskId, Long organizadorId) {
+	public void deleteTask(Long taskId, Long organizadorId) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task != null && organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(task.getEventId(),
@@ -87,7 +88,7 @@ public class TaskService {
 		}
 	}
 
-	public void validarTask(Long taskId, Long organizadorId, Long festeiroId, double pontos) {
+	public void validarTask(Long taskId, Long organizadorId, Long festeiroId, double pontos) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task == null) {
 			throw new IllegalStateException("Task não encontrada.");
@@ -103,7 +104,7 @@ public class TaskService {
 		festeiroHasTaskRepository.update(festeiroHasTask);
 	}
 
-	public void iniciarTask(Long taskId, Long festeiroId) {
+	public void iniciarTask(Long taskId, Long festeiroId) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task == null) {
 			throw new IllegalStateException("Task não encontrada.");

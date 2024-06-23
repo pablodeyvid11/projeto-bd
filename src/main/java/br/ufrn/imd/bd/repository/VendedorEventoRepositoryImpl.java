@@ -32,7 +32,7 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 	}
 
 	@Override
-	public void solicitarVenda(VendedorHasEvento vendedorEvento) {
+	public void solicitarVenda(VendedorHasEvento vendedorEvento) throws SQLException {
 		String sql = String.format("INSERT INTO %s (VENDEDOR_id, EVENTO_id, is_aprovado) VALUES (?, ?, ?)",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -43,11 +43,12 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void aprovarVenda(Long vendedorId, Long eventoId, Boolean isAprovado) {
+	public void aprovarVenda(Long vendedorId, Long eventoId, Boolean isAprovado) throws SQLException {
 		String sql = String.format("UPDATE %s SET is_aprovado = ? WHERE VENDEDOR_id = ? AND EVENTO_id = ?",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -58,11 +59,12 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public VendedorHasEvento findByVendedorIdAndEventoId(Long vendedorId, Long eventoId) {
+	public VendedorHasEvento findByVendedorIdAndEventoId(Long vendedorId, Long eventoId) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE VENDEDOR_id = ? AND EVENTO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -75,12 +77,14 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public List<VendedorHasEvento> findAllByEventoIdAndIsAprovado(Long eventoId, Boolean isAprovado) {
+	public List<VendedorHasEvento> findAllByEventoIdAndIsAprovado(Long eventoId, Boolean isAprovado)
+			throws SQLException {
 		List<VendedorHasEvento> vendedores = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ? AND is_aprovado = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -94,12 +98,13 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return vendedores;
 	}
 
 	@Override
-	public List<VendedorHasEvento> findAllByEventoIdAndIsAprovadoIsNull(Long eventoId) {
+	public List<VendedorHasEvento> findAllByEventoIdAndIsAprovadoIsNull(Long eventoId) throws SQLException {
 		List<VendedorHasEvento> vendedores = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ? AND is_aprovado IS NULL", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -112,6 +117,7 @@ public class VendedorEventoRepositoryImpl implements VendedorEventoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return vendedores;
 	}

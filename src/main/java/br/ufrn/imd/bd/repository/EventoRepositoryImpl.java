@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class EventoRepositoryImpl implements EventosRepository {
 	}
 
 	@Override
-	public List<Evento> findAll() {
+	public List<Evento> findAll() throws SQLException {
 		List<Evento> eventos = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s", getTableName());
 
@@ -46,12 +45,13 @@ public class EventoRepositoryImpl implements EventosRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return eventos;
 	}
 
 	@Override
-	public Evento findById(Long id) {
+	public Evento findById(Long id) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -63,12 +63,13 @@ public class EventoRepositoryImpl implements EventosRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(Evento evento) {
+	public void save(Evento evento) throws SQLException {
 		String sql = String.format(
 				"INSERT INTO %s (id, titulo, preco_ingresso, descricao, data_horario_inicio, data_horario_fim, qtd_ingressos) VALUES (?, ?, ?, ?, ?, ?, ?)",
 				getTableName());
@@ -84,40 +85,44 @@ public class EventoRepositoryImpl implements EventosRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
+	@Override
+	public void update(Evento evento) throws SQLException {
+		String sql = String.format(
+				"UPDATE %s SET titulo = ?, preco_ingresso = ?, descricao = ?, data_horario_inicio = ?, data_horario_fim = ?, qtd_ingressos = ? WHERE id = ?",
+				getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setString(1, evento.getTitle());
+			ps.setBigDecimal(2, BigDecimal.valueOf(evento.getIngressoPrice()));
+			ps.setString(3, evento.getDescription());
+			ps.setDate(4, convertToSqlDate(evento.getStartDateTime()));
+			ps.setDate(5, convertToSqlDate(evento.getEndDateTime()));
+			ps.setInt(6, evento.getQtyIngressos());
+			ps.setLong(7, evento.getId());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
 
-    @Override
-    public void update(Evento evento) {
-        String sql = String.format("UPDATE %s SET titulo = ?, preco_ingresso = ?, descricao = ?, data_horario_inicio = ?, data_horario_fim = ?, qtd_ingressos = ? WHERE id = ?", getTableName());
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, evento.getTitle());
-            ps.setBigDecimal(2, BigDecimal.valueOf(evento.getIngressoPrice()));
-            ps.setString(3, evento.getDescription());
-            ps.setDate(4, convertToSqlDate(evento.getStartDateTime()));
-            ps.setDate(5, convertToSqlDate(evento.getEndDateTime()));
-            ps.setInt(6, evento.getQtyIngressos());
-            ps.setLong(7, evento.getId());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	@Override
+	public void delete(Long id) throws SQLException {
+		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setLong(1, id);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
 
-    @Override
-    public void delete(Long id) {
-        String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-	
 	private Evento mapRowToEvento(ResultSet rs) throws SQLException {
 		Evento evento = new Evento();
 		evento.setId(rs.getLong("id"));
@@ -125,7 +130,7 @@ public class EventoRepositoryImpl implements EventosRepository {
 		evento.setIngressoPrice(rs.getBigDecimal("preco_ingresso").doubleValue());
 		evento.setDescription(rs.getString("descricao"));
 		evento.setStartDateTime(rs.getTimestamp("data_horario_inicio").toLocalDateTime());
-	    evento.setEndDateTime(rs.getTimestamp("data_horario_fim").toLocalDateTime());
+		evento.setEndDateTime(rs.getTimestamp("data_horario_fim").toLocalDateTime());
 		evento.setQtyIngressos(rs.getInt("qtd_ingressos"));
 		return evento;
 	}

@@ -31,7 +31,7 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 	}
 
 	@Override
-	public void save(FesteiroHasTask festeiroHasTask) {
+	public void save(FesteiroHasTask festeiroHasTask) throws SQLException {
 		String sql = String.format(
 				"INSERT INTO %s (FESTEIRO_id, TASK_id, pontos_ganhos, is_validado) VALUES (?, ?, ?, ?)",
 				getTableName());
@@ -44,11 +44,12 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean existsByFesteiroIdAndTaskId(Long festeiroId, Long taskId) {
+	public boolean existsByFesteiroIdAndTaskId(Long festeiroId, Long taskId) throws SQLException {
 		String sql = String.format("SELECT COUNT(*) FROM %s WHERE FESTEIRO_id = ? AND TASK_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -61,12 +62,13 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return false;
 	}
 
 	@Override
-	public void update(FesteiroHasTask festeiroHasTask) {
+	public void update(FesteiroHasTask festeiroHasTask) throws SQLException {
 		String sql = String.format(
 				"UPDATE %s SET pontos_ganhos = ?, is_validado = ? WHERE TASK_id = ? AND FESTEIRO_id = ?",
 				getTableName());
@@ -80,12 +82,13 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 
 	}
 
 	@Override
-	public FesteiroHasTask findByTaskIdAndFesteiroId(Long taskId, Long festeiroId) {
+	public FesteiroHasTask findByTaskIdAndFesteiroId(Long taskId, Long festeiroId) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE TASK_id = ? AND FESTEIRO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -98,6 +101,7 @@ public class FesteiroHasTaskRepositoryImpl implements FesteiroHasTaskRepository 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}

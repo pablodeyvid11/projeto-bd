@@ -1,6 +1,6 @@
 package br.ufrn.imd.bd.services;
 
-import java.time.LocalDateTime;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +25,24 @@ public class AvaliacaoService {
 	@Autowired
 	private IngressoRepository ingressoRepository;
 
-	public List<FesteiroAvaliaEvento> getAllAvaliacoes() {
+	public List<FesteiroAvaliaEvento> getAllAvaliacoes() throws SQLException {
 		return avaliacaoRepository.findAll();
 	}
 
-	public List<FesteiroAvaliaEvento> getAvaliacoesByEventoId(Long eventoId) {
+	public List<FesteiroAvaliaEvento> getAvaliacoesByEventoId(Long eventoId) throws SQLException {
 		return avaliacaoRepository.findAllByEventoId(eventoId);
 	}
 
-	public Double getAverageRatingByEventoId(Long eventoId) {
+	public Double getAverageRatingByEventoId(Long eventoId) throws SQLException {
 		return avaliacaoRepository.findAverageRatingByEventoId(eventoId);
 	}
 
-	public FesteiroAvaliaEvento getAvaliacaoByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) {
+	public FesteiroAvaliaEvento getAvaliacaoByEventoIdAndFesteiroId(Long eventoId, Long festeiroId)
+			throws SQLException {
 		return avaliacaoRepository.findByEventoIdAndFesteiroId(eventoId, festeiroId);
 	}
 
-	public void criarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) {
+	public void criarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) throws SQLException {
 		Evento evento = eventoRepository.findById(avaliacao.getEventoId());
 		if (evento == null) {
 			throw new IllegalStateException("Evento não encontrado.");
@@ -56,7 +57,7 @@ public class AvaliacaoService {
 		avaliacaoRepository.save(avaliacao);
 	}
 
-	public void atualizarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) {
+	public void atualizarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) throws SQLException {
 		FesteiroAvaliaEvento existingAvaliacao = avaliacaoRepository
 				.findByEventoIdAndFesteiroId(avaliacao.getEventoId(), festeiroId);
 		if (existingAvaliacao == null) {
@@ -67,7 +68,7 @@ public class AvaliacaoService {
 		avaliacaoRepository.update(avaliacao);
 	}
 
-	public void deletarAvaliacao(Long eventoId, Long festeiroId) {
+	public void deletarAvaliacao(Long eventoId, Long festeiroId) throws SQLException {
 		FesteiroAvaliaEvento existingAvaliacao = avaliacaoRepository.findByEventoIdAndFesteiroId(eventoId, festeiroId);
 		if (existingAvaliacao == null) {
 			throw new IllegalStateException("Avaliação não encontrada.");

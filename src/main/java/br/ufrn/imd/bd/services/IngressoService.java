@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class IngressoService {
 	@Autowired
 	private FesteiroRepository festeiroRepository;
 
-	public String comprarIngresso(Long eventoId, Long festeiroId) {
+	public String comprarIngresso(Long eventoId, Long festeiroId) throws SQLException {
 		if (!festeiroRepository.existsById(festeiroId)) {
 			throw new IllegalStateException("Festeiro não encontrado.");
 		}

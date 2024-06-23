@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.controllers;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,116 +32,118 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/noticias")
 public class NoticiaController {
 
-    @Autowired
-    private NoticiaService noticiaService;
+	@Autowired
+	private NoticiaService noticiaService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Operation(summary = "Obter todas as notícias de um evento")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Notícias obtidas com sucesso"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @GetMapping(value = "/evento/{eventoId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getNoticiasByEventoId(@PathVariable Long eventoId, HttpServletRequest request) {
-        try {
-            List<Noticia> noticias = noticiaService.getNoticiasByEventoId(eventoId);
-            return ResponseEntity.ok(noticias);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Obter todas as notícias de um evento")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notícias obtidas com sucesso"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@GetMapping(value = "/evento/{eventoId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getNoticiasByEventoId(@PathVariable Long eventoId, HttpServletRequest request) {
+		try {
+			List<Noticia> noticias = noticiaService.getNoticiasByEventoId(eventoId);
+			return ResponseEntity.ok(noticias);
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Obter notícia por ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Notícia obtida com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Notícia não encontrada")
-    })
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getNoticiaById(@PathVariable Long id, HttpServletRequest request) {
-        try {
-            Noticia noticia = noticiaService.getNoticiaById(id);
-            return ResponseEntity.ok(noticia);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Obter notícia por ID")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notícia obtida com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Notícia não encontrada") })
+	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getNoticiaById(@PathVariable Long id, HttpServletRequest request) {
+		try {
+			Noticia noticia = noticiaService.getNoticiaById(id);
+			return ResponseEntity.ok(noticia);
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ApiErrorDTO(HttpStatus.NOT_FOUND.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Criar uma nova notícia")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Notícia criada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNoticia(@RequestBody Noticia noticia, @RequestParam Long eventoId,
-                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                           HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            noticia.setEventoId(eventoId);
-            noticiaService.createNoticia(noticia, organizadorId);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Criar uma nova notícia")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Notícia criada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createNoticia(@RequestBody Noticia noticia, @RequestParam Long eventoId,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			noticia.setEventoId(eventoId);
+			noticiaService.createNoticia(noticia, organizadorId);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Atualizar uma notícia")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Notícia atualizada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-        @ApiResponse(responseCode = "404", description = "Notícia não encontrada"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateNoticia(@PathVariable Long id, @RequestBody Noticia noticia,
-                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                           HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            noticia.setId(id);
-            noticiaService.updateNoticia(noticia, organizadorId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Atualizar uma notícia")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notícia atualizada com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "404", description = "Notícia não encontrada"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> updateNoticia(@PathVariable Long id, @RequestBody Noticia noticia,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			noticia.setId(id);
+			noticiaService.updateNoticia(noticia, organizadorId);
+			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 
-    @Operation(summary = "Deletar uma notícia")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Notícia deletada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Notícia não encontrada"),
-        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteNoticia(@PathVariable Long id,
-                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                           HttpServletRequest request) {
-        try {
-            Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
-            noticiaService.deleteNoticia(id, organizadorId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
-        }
-    }
+	@Operation(summary = "Deletar uma notícia")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notícia deletada com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Notícia não encontrada"),
+			@ApiResponse(responseCode = "500", description = "Erro interno do servidor") })
+	@DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> deleteNoticia(@PathVariable Long id,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, HttpServletRequest request) {
+		try {
+			Long organizadorId = userService.findUserFromToken(authorizationHeader).getId();
+			noticiaService.deleteNoticia(id, organizadorId);
+			return ResponseEntity.ok().build();
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ApiErrorDTO(HttpStatus.BAD_REQUEST.value(), request.getRequestURI(), e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					new ApiErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI(), e.getMessage()));
+		}
+	}
 }

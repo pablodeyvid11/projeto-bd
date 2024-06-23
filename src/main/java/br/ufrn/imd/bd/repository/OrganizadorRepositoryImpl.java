@@ -28,7 +28,7 @@ public class OrganizadorRepositoryImpl implements OrganizadorRepository {
 	}
 
 	@Override
-	public void save(Long id, String cargo) {
+	public void save(Long id, String cargo) throws SQLException {
 		String sql = String.format("INSERT INTO %s (id, cargo) VALUES (?, ?)", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -37,11 +37,12 @@ public class OrganizadorRepositoryImpl implements OrganizadorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void updateOrganizador(Long id, String cargo) {
+	public void updateOrganizador(Long id, String cargo) throws SQLException {
 		String sql = String.format("UPDATE %s SET cargo = ? WHERE id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -50,11 +51,12 @@ public class OrganizadorRepositoryImpl implements OrganizadorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void deleteOrganizador(Long id) {
+	public void deleteOrganizador(Long id) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE id = ?", getTableName());
 
 		try (Connection connection = dataSource.getConnection();
@@ -63,6 +65,7 @@ public class OrganizadorRepositoryImpl implements OrganizadorRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 }

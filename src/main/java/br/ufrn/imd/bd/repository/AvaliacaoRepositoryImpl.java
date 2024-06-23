@@ -32,7 +32,7 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 	}
 
 	@Override
-	public List<FesteiroAvaliaEvento> findAll() {
+	public List<FesteiroAvaliaEvento> findAll() throws SQLException {
 		List<FesteiroAvaliaEvento> avaliacoes = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s", getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -43,12 +43,13 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return avaliacoes;
 	}
 
 	@Override
-	public List<FesteiroAvaliaEvento> findAllByEventoId(Long eventoId) {
+	public List<FesteiroAvaliaEvento> findAllByEventoId(Long eventoId) throws SQLException {
 		List<FesteiroAvaliaEvento> avaliacoes = new ArrayList<>();
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ?", getTableName());
 
@@ -62,12 +63,13 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return avaliacoes;
 	}
 
 	@Override
-	public Double findAverageRatingByEventoId(Long eventoId) {
+	public Double findAverageRatingByEventoId(Long eventoId) throws SQLException {
 		String sql = String.format("SELECT AVG(nota) AS average_rating FROM %s WHERE EVENTO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,12 +81,13 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public FesteiroAvaliaEvento findByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) {
+	public FesteiroAvaliaEvento findByEventoIdAndFesteiroId(Long eventoId, Long festeiroId) throws SQLException {
 		String sql = String.format("SELECT * FROM %s WHERE EVENTO_id = ? AND FESTEIRO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -97,12 +100,13 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return null;
 	}
 
 	@Override
-	public void save(FesteiroAvaliaEvento avaliacao) {
+	public void save(FesteiroAvaliaEvento avaliacao) throws SQLException {
 		String sql = String.format("INSERT INTO %s (EVENTO_id, FESTEIRO_id, nota, comentario) VALUES (?, ?, ?, ?)",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -114,11 +118,12 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void update(FesteiroAvaliaEvento avaliacao) {
+	public void update(FesteiroAvaliaEvento avaliacao) throws SQLException {
 		String sql = String.format("UPDATE %s SET nota = ?, comentario = ? WHERE EVENTO_id = ? AND FESTEIRO_id = ?",
 				getTableName());
 		try (Connection connection = dataSource.getConnection();
@@ -130,11 +135,12 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
 	@Override
-	public void delete(Long eventoId, Long festeiroId) {
+	public void delete(Long eventoId, Long festeiroId) throws SQLException {
 		String sql = String.format("DELETE FROM %s WHERE EVENTO_id = ? AND FESTEIRO_id = ?", getTableName());
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -143,6 +149,7 @@ public class AvaliacaoRepositoryImpl implements AvaliacaoRepository {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

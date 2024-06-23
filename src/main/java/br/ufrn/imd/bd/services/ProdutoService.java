@@ -1,5 +1,6 @@
 package br.ufrn.imd.bd.services;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +18,19 @@ public class ProdutoService {
 	@Autowired
 	private VendedorRepository vendedorRepository;
 
-	public List<VendedorProdutos> getAllProdutos() {
+	public List<VendedorProdutos> getAllProdutos() throws SQLException {
 		return produtoRepository.findAll();
 	}
 
-	public List<VendedorProdutos> getProdutosByVendedorId(Long vendedorId) {
+	public List<VendedorProdutos> getProdutosByVendedorId(Long vendedorId) throws SQLException {
 		return produtoRepository.findByVendedorId(vendedorId);
 	}
 
-	public VendedorProdutos getProdutoByNomeAndVendedorId(String nome, Long vendedorId) {
+	public VendedorProdutos getProdutoByNomeAndVendedorId(String nome, Long vendedorId) throws SQLException {
 		return produtoRepository.findByNomeAndVendedorId(nome, vendedorId);
 	}
 
-	public void createProduto(VendedorProdutos produto, Long vendedorId) {
+	public void createProduto(VendedorProdutos produto, Long vendedorId) throws SQLException {
 		if (vendedorRepository.existsById(vendedorId)) {
 			produto.setVendedorId(vendedorId);
 			produtoRepository.save(produto);
@@ -38,7 +39,7 @@ public class ProdutoService {
 		}
 	}
 
-	public void updateProduto(VendedorProdutos produto, Long vendedorId) {
+	public void updateProduto(VendedorProdutos produto, Long vendedorId) throws SQLException {
 		if (vendedorRepository.existsById(vendedorId)) {
 			if (produto.getVendedorId().equals(vendedorId)) {
 				produtoRepository.update(produto);
@@ -50,7 +51,7 @@ public class ProdutoService {
 		}
 	}
 
-	public void deleteProduto(String nome, Long vendedorId) {
+	public void deleteProduto(String nome, Long vendedorId) throws SQLException {
 		if (vendedorRepository.existsById(vendedorId)) {
 			VendedorProdutos produto = produtoRepository.findByNomeAndVendedorId(nome, vendedorId);
 			if (produto != null && produto.getVendedorId().equals(vendedorId)) {
