@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.FesteiroHasTask;
 import br.ufrn.imd.bd.model.Ingresso;
@@ -35,18 +36,22 @@ public class TaskService {
 	@Autowired
 	private IngressoRepository ingressoRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Task> getAllTasks() throws SQLException {
 		return taskRepository.findAll();
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Task> getTasksByEventoId(Long eventoId) throws SQLException {
 		return taskRepository.findAllByEventoId(eventoId);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public Task getTaskById(Long id) throws SQLException {
 		return taskRepository.findById(id);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void createTask(Task task, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(task.getEventId(),
@@ -61,6 +66,7 @@ public class TaskService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void updateTask(Task task, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(task.getEventId(),
@@ -74,6 +80,7 @@ public class TaskService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deleteTask(Long taskId, Long organizadorId) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task != null && organizadorRepository.existsById(organizadorId)) {
@@ -88,6 +95,7 @@ public class TaskService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void validarTask(Long taskId, Long organizadorId, Long festeiroId, double pontos) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task == null) {
@@ -104,6 +112,7 @@ public class TaskService {
 		festeiroHasTaskRepository.update(festeiroHasTask);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void iniciarTask(Long taskId, Long festeiroId) throws SQLException {
 		Task task = taskRepository.findById(taskId);
 		if (task == null) {

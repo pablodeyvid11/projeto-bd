@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.User;
 import br.ufrn.imd.bd.model.UserDetailsImpl;
@@ -42,10 +43,12 @@ public class UserService {
 	@Autowired
 	private JwtTokenService jwtTokenService;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public User findByEmail(String email) throws SQLException {
 		return userRepository.findByEmail(email);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public User signon(UserDTO sigonRecord) throws SQLException {
 		User user = new User();
 		Long nextId = userRepository.getNextId();
@@ -70,6 +73,7 @@ public class UserService {
 		return user;
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public RecoveryJWTDTO login(SigninDTO siginRecord) throws SQLException {
 
 		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
@@ -82,6 +86,7 @@ public class UserService {
 		return new RecoveryJWTDTO(jwtTokenService.generateToken(userDetails));
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void update(UserDTO sigonRecord) throws SQLException {
 		User user = userRepository.findById(sigonRecord.id());
 		if (user == null) {
@@ -106,6 +111,7 @@ public class UserService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public User findUserFromToken(String authorizationHeader) throws SQLException {
 		String token = null;
 
@@ -118,6 +124,7 @@ public class UserService {
 		return userRepository.findByEmail(username);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deleteById(Long id) throws SQLException {
 		if (festeiroRepository.existsById(id)) {
 			festeiroRepository.deleteFesteiro(id);

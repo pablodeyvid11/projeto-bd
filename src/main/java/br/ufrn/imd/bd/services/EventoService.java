@@ -5,37 +5,41 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.Estabelecimento;
 import br.ufrn.imd.bd.model.EstabelecimentoHasOrganizadorHasEvento;
 import br.ufrn.imd.bd.model.Evento;
-import br.ufrn.imd.bd.repository.EstabelecimentoHasOrganizadorHasEventoRepositoryImpl;
-import br.ufrn.imd.bd.repository.EventoRepositoryImpl;
-import br.ufrn.imd.bd.repository.OrganizadorRepositoryImpl;
+import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoHasOrganizadorHasEventoRepository;
 import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoRepository;
+import br.ufrn.imd.bd.repository.interfaces.EventosRepository;
+import br.ufrn.imd.bd.repository.interfaces.OrganizadorRepository;
 
 @Service
 public class EventoService {
 	@Autowired
-	private EventoRepositoryImpl eventoRepository;
+	private EventosRepository eventoRepository;
 
 	@Autowired
-	private EstabelecimentoHasOrganizadorHasEventoRepositoryImpl estabelecimentoEventoOrganizadorRepository;
+	private EstabelecimentoHasOrganizadorHasEventoRepository estabelecimentoEventoOrganizadorRepository;
 
 	@Autowired
 	private EstabelecimentoRepository estabelecimentoRepository;
 
 	@Autowired
-	private OrganizadorRepositoryImpl organizadorRepository;
+	private OrganizadorRepository organizadorRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Evento> getAllEventos() throws SQLException {
 		return eventoRepository.findAll();
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public Evento getEventoById(Long id) throws SQLException {
 		return eventoRepository.findById(id);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void createEvento(Evento evento, Long organizadorId, String estabelecimentoCnpj) throws SQLException {
 
 		Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoCnpj);
@@ -60,6 +64,7 @@ public class EventoService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void addOrganizadorToEvento(Long eventoId, Long organizadorId, Long donoId) throws SQLException {
 		Evento evento = eventoRepository.findById(eventoId);
 		if (evento == null) {
@@ -79,6 +84,7 @@ public class EventoService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void updateEvento(Evento evento, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			eventoRepository.update(evento);
@@ -87,6 +93,7 @@ public class EventoService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deleteEvento(Long eventoId, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			estabelecimentoEventoOrganizadorRepository.deleteByEventoId(eventoId);

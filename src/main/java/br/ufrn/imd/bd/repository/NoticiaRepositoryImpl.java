@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,7 +140,7 @@ public class NoticiaRepositoryImpl implements NoticiaRepository {
 		Noticia noticia = new Noticia();
 		noticia.setId(rs.getLong("id"));
 		noticia.setTitle(rs.getString("titulo"));
-		noticia.setDate(rs.getDate("data_horario").toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+		noticia.setDate(rs.getTimestamp("data_horario").toLocalDateTime());
 		noticia.setText(rs.getString("texto"));
 		noticia.setMidiaPath(rs.getString("midia_path"));
 		noticia.setEventoId(rs.getLong("EVENTO_id"));

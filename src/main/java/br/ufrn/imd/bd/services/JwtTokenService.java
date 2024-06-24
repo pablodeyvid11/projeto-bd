@@ -27,12 +27,9 @@ public class JwtTokenService {
 
 			Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
 
-			return JWT.create().withIssuer(ISSUER) 
-					.withIssuedAt(creationDate()) 
-					.withExpiresAt(expirationDate())
-					.withSubject(user.getUsername())
-					.sign(algorithm); 
-			
+			return JWT.create().withIssuer(ISSUER).withIssuedAt(creationDate()).withExpiresAt(expirationDate())
+					.withSubject(user.getUsername()).sign(algorithm);
+
 		} catch (JWTCreationException exception) {
 			throw new JWTCreationException("Erro ao gerar token.", exception);
 		}

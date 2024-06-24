@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.Evento;
 import br.ufrn.imd.bd.model.FesteiroAvaliaEvento;
@@ -25,23 +26,28 @@ public class AvaliacaoService {
 	@Autowired
 	private IngressoRepository ingressoRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<FesteiroAvaliaEvento> getAllAvaliacoes() throws SQLException {
 		return avaliacaoRepository.findAll();
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<FesteiroAvaliaEvento> getAvaliacoesByEventoId(Long eventoId) throws SQLException {
 		return avaliacaoRepository.findAllByEventoId(eventoId);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public Double getAverageRatingByEventoId(Long eventoId) throws SQLException {
 		return avaliacaoRepository.findAverageRatingByEventoId(eventoId);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public FesteiroAvaliaEvento getAvaliacaoByEventoIdAndFesteiroId(Long eventoId, Long festeiroId)
 			throws SQLException {
 		return avaliacaoRepository.findByEventoIdAndFesteiroId(eventoId, festeiroId);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void criarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) throws SQLException {
 		Evento evento = eventoRepository.findById(avaliacao.getEventoId());
 		if (evento == null) {
@@ -57,6 +63,7 @@ public class AvaliacaoService {
 		avaliacaoRepository.save(avaliacao);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void atualizarAvaliacao(FesteiroAvaliaEvento avaliacao, Long festeiroId) throws SQLException {
 		FesteiroAvaliaEvento existingAvaliacao = avaliacaoRepository
 				.findByEventoIdAndFesteiroId(avaliacao.getEventoId(), festeiroId);
@@ -68,6 +75,7 @@ public class AvaliacaoService {
 		avaliacaoRepository.update(avaliacao);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deletarAvaliacao(Long eventoId, Long festeiroId) throws SQLException {
 		FesteiroAvaliaEvento existingAvaliacao = avaliacaoRepository.findByEventoIdAndFesteiroId(eventoId, festeiroId);
 		if (existingAvaliacao == null) {

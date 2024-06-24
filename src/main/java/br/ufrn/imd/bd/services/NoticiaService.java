@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.Noticia;
 import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoHasOrganizadorHasEventoRepository;
@@ -24,18 +25,22 @@ public class NoticiaService {
 	@Autowired
 	private OrganizadorRepository organizadorRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Noticia> getNoticiasByEventoId(Long eventoId) throws SQLException {
 		return noticiaRepository.findAllByEventoId(eventoId);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Noticia> getAllNoticias() throws SQLException {
 		return noticiaRepository.findAll();
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public Noticia getNoticiaById(Long id) throws SQLException {
 		return noticiaRepository.findById(id);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void createNoticia(Noticia noticia, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(noticia.getEventoId(),
@@ -51,6 +56,7 @@ public class NoticiaService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void updateNoticia(Noticia noticia, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			if (estabelecimentoHasOrganizadorHasEventoRepository.isEventoCreatedByOrganizador(noticia.getEventoId(),
@@ -65,6 +71,7 @@ public class NoticiaService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deleteNoticia(Long noticiaId, Long organizadorId) throws SQLException {
 		Noticia noticia = noticiaRepository.findById(noticiaId);
 		if (noticia != null && organizadorRepository.existsById(organizadorId)) {

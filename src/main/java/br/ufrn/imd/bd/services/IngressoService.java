@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.Ingresso;
 import br.ufrn.imd.bd.repository.interfaces.EventosRepository;
@@ -22,6 +23,7 @@ public class IngressoService {
 	@Autowired
 	private FesteiroRepository festeiroRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public String comprarIngresso(Long eventoId, Long festeiroId) throws SQLException {
 		if (!festeiroRepository.existsById(festeiroId)) {
 			throw new IllegalStateException("Festeiro não encontrado.");

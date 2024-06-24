@@ -5,28 +5,32 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.ufrn.imd.bd.model.Estabelecimento;
-import br.ufrn.imd.bd.repository.EstabelecimentoRepositoryImpl;
-import br.ufrn.imd.bd.repository.OrganizadorRepositoryImpl;
+import br.ufrn.imd.bd.repository.interfaces.EstabelecimentoRepository;
+import br.ufrn.imd.bd.repository.interfaces.OrganizadorRepository;
 
 @Service
 public class EstabelecimentoService {
 
 	@Autowired
-	private EstabelecimentoRepositoryImpl estabelecimentoRepository;
+	private EstabelecimentoRepository estabelecimentoRepository;
 
 	@Autowired
-	private OrganizadorRepositoryImpl organizadorRepository;
+	private OrganizadorRepository organizadorRepository;
 
+	@Transactional(rollbackFor = SQLException.class)
 	public List<Estabelecimento> getAllEstabelecimentos() throws SQLException {
 		return estabelecimentoRepository.findAll();
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public Estabelecimento getEstabelecimentoById(String cnpj) throws SQLException {
 		return estabelecimentoRepository.findById(cnpj);
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void createEstabelecimento(Estabelecimento estabelecimento, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			estabelecimento.setOrganizadorCriadorId(organizadorId);
@@ -36,6 +40,7 @@ public class EstabelecimentoService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void updateEstabelecimento(Estabelecimento estabelecimento, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			estabelecimentoRepository.update(estabelecimento);
@@ -44,6 +49,7 @@ public class EstabelecimentoService {
 		}
 	}
 
+	@Transactional(rollbackFor = SQLException.class)
 	public void deleteEstabelecimento(String cnpj, Long organizadorId) throws SQLException {
 		if (organizadorRepository.existsById(organizadorId)) {
 			estabelecimentoRepository.delete(cnpj);
